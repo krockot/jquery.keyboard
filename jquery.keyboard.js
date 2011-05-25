@@ -21,7 +21,7 @@
    $(document).ready(function() {
     // The counter illustrates sane key-repeat handling without dupes.
     var counter = {}
-       $(document).keyboard(function(e) {
+    $(document).keyboard(function(e) {
        var keyname = e.chr;
        if(keyname == null)
            keyname = $.KeyNames[e.key];
@@ -47,17 +47,17 @@
 
     - You always get a valid key code in e.key; it usually has an entry in $.KeyNames
       and is comparable to a named entry in $.Keys (i.e., you can test
-	  e.key == $.Keys.Escape).
+      e.key == $.Keys.Escape).
     - You get a character representation of the keystroke in e.chr if and only if
       neither Ctrl or Alt is pressed, the keystroke has a character representation,
       AND the key is NOT $.Keys.Space, $.Keys.Enter, or $.Keys.Tab.
     - If a sane and valid character representation is not in e.chr, e.chr is
-	  guaranteed to be null.
+      guaranteed to be null.
     - e.chr is affected by the shift modifier.  An event with e.key == $.Keys.Key0
-	  and e.shift == true will hold e.chr == ')'.
+      and e.shift == true will hold e.chr == ')'.
     - e.alt, e.ctrl, and e.shift are always accurate.
     - Most keys and key combinations will fire repeated keyboard events when held
-	  down.*
+      down.*
 
    * Opera still does some funky things that are unavoiable, but they should almost
    never be a concern.  Numeric keypad events are treated as normal numeric key
@@ -276,7 +276,6 @@
                 keyboard.keydownSent = false;
                 return true;
         }
-        return keyboard.fn(e);
     }
 
     keyboard.onKeypress = function(event) {
