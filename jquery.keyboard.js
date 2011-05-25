@@ -298,15 +298,15 @@
         if(!keyboard.keydownSent) {
             // Gecko will set keyCode = 0 for printable characters; nobody else seems to do this.
             if(event.keyCode == 0)
-                e.chr = String.fromCharCode(event.chrCode);
+                e.chr = String.fromCharCode(event.charCode);
             // Opera sets which = 0 for NON-printable characters; nobody else seems to do THIS.
             else if(event.which == 0)
                 e.chr = null;
             // Usually we can just use charCode if it exists.
-            else if(typeof(event.chrCode) != 'undefined' && event.chrCode > 0)
-                e.chr = String.fromCharCode(event.chrCode);
+            else if(typeof(event.charCode) != 'undefined' && event.charCode > 0)
+                e.chr = String.fromCharCode(event.charCode);
             // Finally, in Opera, non-zero which holds the charCode
-            else if(typeof(event.chrCode) == 'undefined') {
+            else if(typeof(event.charCode) == 'undefined') {
                 e.chr = String.fromCharCode(event.which);
             }
         }
