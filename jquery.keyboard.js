@@ -209,10 +209,10 @@
 
     $.fn.keyboard = function(fn) {
         keyboard.fn = fn;
-		if(!registered) {
+		if(!keyboard.registered) {
 	        this.keydown(keyboard.onKeydown);
 	        this.keypress(keyboard.onKeypress);
-			registered = true;
+			keyboard.registered = true;
 		}
     }
 
