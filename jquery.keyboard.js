@@ -83,10 +83,9 @@
 
      - Whatever browser is on my old Palm Pre (it works!)
 
-   Perhaps most importantly missing from this list are Safari and anything else running
-   under OS X, as well as browsers on various popular mobile devices.  International
-   keyboards could also use some testing, though they should not present any significant
-   inconsistencies.
+	 - Safari 3 under OS X 10.4 with a British keyboard
+
+   Still needs lots of testing on several other platforms.
 */
 
 (function($) {
@@ -204,13 +203,17 @@
         },
         lastKeydown: {},
         keydownSent: false,
-        firstKeypress: false
+        firstKeypress: false,
+		registered: false
     }
 
     $.fn.keyboard = function(fn) {
         keyboard.fn = fn;
-        this.keydown(keyboard.onKeydown);
-        this.keypress(keyboard.onKeypress);
+		if(!registered) {
+	        this.keydown(keyboard.onKeydown);
+	        this.keypress(keyboard.onKeypress);
+			registered = true;
+		}
     }
 
     // Keydown events are only propagated to the handler if
