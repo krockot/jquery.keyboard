@@ -1,18 +1,11 @@
 /*
    jquery.keyboard.js
 
-   Copyright (c) 2011 Ken Rockot <ken-s/(-[^-]*){4}-/@/-oz.gs>
-   All rights reserved.
+   This simple jQuery plugin provides a keyboard method for trapping
+   keystroke events while avoiding many of the inconsistences that appear
+   from browser to browser.
 
-   Everyone is permitted to copy and distribute verbatim or modified copies
-   of this software in source or binary form.
-
-   This simple jQuery plugin provides a keyboard function, allowing you to
-   painlessly trap arbitrary keystrokes in the browser without having to
-   think about the crippling inconsistencies that appear from browser to
-   browser.
-
-   Unlike js-hotkeys this does not allow the caller to set up specific hotkey
+   This does not allow the caller to set up specific hotkey
    handlers, but instead enables the registration of a single global keypress
    handler that takes a consistent, well-defined event argument.
 
@@ -23,7 +16,7 @@
     var counter = {}
     $(document).keyboard(function(e) {
        var keyname = e.chr;
-       if(keyname == null)
+       if(keyname === null)
            keyname = $.KeyNames[e.key];
        if(e.shift) keyname = "S-" + keyname;
        if(e.alt) keyname = "A-" + keyname;
@@ -34,58 +27,33 @@
     });
    });
 
-   Pretty much everything that this plugin can do is demonstrated by this example.
-   Additionally, a $.Keys object is defined to allow for mindless testing of
-   common key code (e.key) values.  These definitions depend at least in part on
-   keyboard layout, so YMMV.  Many common keys like $.Keys.Enter, $.Keys.Escape,
-   $.Keys.Space, and $.Keys.Tab should be safe to rely upon.
+   Additionally, the $.Keys object provides named entries for various common
+   key codes, though some of these will vary with different keyboard layouts.
+   Common keys like $.Keys.Enter, $.Keys.Escape, $.Keys.Space, and $.Keys.Tab
+   should be safe to rely upon.
 
-   Of note is that for any given keystroke or key combination, you can expect EXACTLY
+   For any given keystroke or key combination, you can expect exactly
    the same event content in a Webkit, Gecko, or even Opera* browser.
 
-   Specifically, here are the semantics of a keyboard event e:
+   The semantics of a keyboard event e are as follows:
 
-    - You always get a valid key code in e.key; it usually has an entry in $.KeyNames
-      and is comparable to a named entry in $.Keys (i.e., you can test
-      e.key == $.Keys.Escape).
-    - You get a character representation of the keystroke in e.chr if and only if
+    - e.key always holds a valid key code; it usually has an entry in $.KeyNames
+      and is comparable to a named entry in $.Keys
+    - e.chr contains a character representation of the keystroke iff
       neither Ctrl or Alt is pressed, the keystroke has a character representation,
-      AND the key is NOT $.Keys.Space, $.Keys.Enter, or $.Keys.Tab.
-    - If a sane and valid character representation is not in e.chr, e.chr is
-      guaranteed to be null.
-    - e.chr is affected by the shift modifier.  An event with e.key == $.Keys.Key0
-      and e.shift == true will hold e.chr == ')'.
-    - e.alt, e.ctrl, and e.shift are always accurate.
+      and the key is not Space, Enter, or Tab.
+    - If a valid character representation is not in e.chr, e.chr is null.
+    - e.chr is affected by the Shift modifier.  An event with e.key === $.Keys.Key0
+      and e.shift === true will hold e.chr === ')'.
+    - e.alt, e.ctrl, and e.shift are boolean key states that are always accurate.
     - Most keys and key combinations will fire repeated keyboard events when held
       down.*
 
-   * Opera still does some funky things that are unavoiable, but they should almost
-   never be a concern.  Numeric keypad events are treated as normal numeric key
-   events when Num Lock is on (when off, they behave normally, as Home, End, etc.)
-   Unlike Gecko and Webkit, Ctrl, Alt, and Shift keystrokes themselves do not repeat,
-   but combinations they modify (e.g. Ctrl+D) repeat.
+   * Opera still does some funky things that may be unavoidable.  Namely:
 
-   Some browsers will process keystrokes even if you trap them, and there is nothing
-   that can be done about that.  Try to use things that won't bubble to the browser.
-
-   Finally, this plugin has been tested with a standard US-layout PC keyboard in the
-   following environments:
-
-     - Windows 7
-       - IE 8
-       - Firefox 4.0.1
-       - Chrome 11.0.696.68 and 13.0.774.0
-       - Opera 11.11
-
-     - Ubuntu 10.10, Debian squeeze and wheezy
-       - Various recent versions of Chrome
-       - Firefox 4.0.1
-
-     - Whatever browser is on my old Palm Pre (it works!)
-
-	 - Safari 3 under OS X 10.4 with a British keyboard
-
-   Still needs lots of testing on several other platforms.
+    - Numeric keypad events always behave as if Num Lock is off.
+    - Unlike with Gecko and Webkit, Ctrl, Alt, and Shift keystrokes do not repeat.
+      Combinations they modify (e.g. Ctrl+D) do still repeat.
 */
 
 (function($) {
@@ -193,8 +161,9 @@
 
     // For convenience, a reverse-map of Keys
     $.KeyNames = {};
-    for(var key in $.Keys)
+    for(var key in $.Keys) {
         $.KeyNames[$.Keys[key]] = key;
+    }
 
     var Keys = $.Keys;
     var keyboard = {
@@ -204,24 +173,24 @@
         lastKeydown: {},
         keydownSent: false,
         firstKeypress: false,
-		registered: false
-    }
+        registered: false
+    };
 
     $.fn.keyboard = function(fn) {
         keyboard.fn = fn;
-		if(!keyboard.registered) {
-	        this.keydown(keyboard.onKeydown);
-	        this.keypress(keyboard.onKeypress);
-			keyboard.registered = true;
-		}
-    }
+        if(!keyboard.registered) {
+            this.keydown(keyboard.onKeydown);
+            this.keypress(keyboard.onKeypress);
+            keyboard.registered = true;
+        };
+    };
 
     // Keydown events are only propagated to the handler if
     // Ctrl or Alt modifiers are pressed, or if the actual keystroke
     // is a special key.  Otherwise the keypress handler is used.
-    // This works on the assumption (established through empirical
-    // data) that keydown always fires first in cases where a keystroke
-    // generates both a keydown and keypress event.
+    // This works on the observation that keydown always fires first
+    // in cases where a keystroke generates both a keydown and
+    // keypress event.
     keyboard.onKeydown = function(event) {
         var e = {
             ctrl: event.ctrlKey,
@@ -279,7 +248,7 @@
                 keyboard.keydownSent = false;
                 return true;
         }
-    }
+    };
 
     keyboard.onKeypress = function(event) {
         var e = {
@@ -293,23 +262,26 @@
         // Do not re-send a keystroke that's already been sent by onKeydown
         var first = keyboard.firstKeypress;
         keyboard.firstKeypress = false;
-        if(first && keyboard.keydownSent)
+        if(first && keyboard.keydownSent) {
             return false;
+        }
     
         // Only translate to a character if keydown didn't handle the keystroke.
-        // Consistency ftw.
         if(!keyboard.keydownSent) {
             // Gecko will set keyCode = 0 for printable characters; nobody else seems to do this.
-            if(event.keyCode == 0)
+            if(event.keyCode === 0) {
                 e.chr = String.fromCharCode(event.charCode);
-            // Opera sets which = 0 for NON-printable characters; nobody else seems to do THIS.
-            else if(event.which == 0)
+            }
+            // Opera sets which = 0 for non-printable characters; nobody else seems to do this.
+            else if(event.which === 0) {
                 e.chr = null;
+            }
             // Usually we can just use charCode if it exists.
-            else if(typeof(event.charCode) != 'undefined' && event.charCode > 0)
+            else if(typeof(event.charCode) !== 'undefined' && event.charCode > 0) {
                 e.chr = String.fromCharCode(event.charCode);
-            // Finally, in Opera, non-zero which holds the charCode
-            else if(typeof(event.charCode) == 'undefined') {
+            }
+            // Finally for Opera, a non-zero event.which holds the charCode
+            else if(typeof(event.charCode) === 'undefined') {
                 e.chr = String.fromCharCode(event.which);
             }
         }
@@ -318,8 +290,7 @@
         // Opera often trample it in keypress.
         e.key = keyboard.lastKeydown.key;
 
-        // phew.
         return keyboard.fn(e);
-    }
+    };
 })( jQuery );
 
